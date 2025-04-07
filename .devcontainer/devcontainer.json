@@ -28,8 +28,6 @@
 		"ghcr.io/devcontainers/features/git:1": {}
 	},
 	"forwardPorts": [
-		3000,
-		3001
-	],
-	// "postCreateCommand": "rustup component add rustfmt clippy && cargo install cargo-leptos wasm-pack trunk cargo-generate"
+		3000
+	]
 }
