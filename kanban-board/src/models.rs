@@ -98,4 +98,63 @@ impl KanbanBoard {
             })
             .collect()
     }
+
+    // HTMLに合わせた初期データを作成するメソッドを追加
+    pub fn with_demo_data() -> Self {
+        let mut board = Self::new();
+        
+        // ステートのIDを保存
+        let todo_id = board.states[0].id.clone();
+        let inprogress_id = board.states[1].id.clone();
+        let done_id = board.states[2].id.clone();
+        
+        // Story 1: User Authentication
+        let auth_story = Story::new("User Authentication".to_string());
+        let auth_story_id = auth_story.id.clone();
+        board.add_story(auth_story);
+        
+        // Story 2: Dashboard
+        let dashboard_story = Story::new("Dashboard".to_string());
+        let dashboard_story_id = dashboard_story.id.clone();
+        board.add_story(dashboard_story);
+        
+        // Story 3: Settings Page
+        let settings_story = Story::new("Settings Page".to_string());
+        let settings_story_id = settings_story.id.clone();
+        board.add_story(settings_story);
+        
+        // User Authentication tasks
+        let task1 = Task::new(
+            "Design login screen".to_string(),
+            "Create mockups for login, registration and password reset".to_string()
+        );
+        board.add_task(task1, &auth_story_id, &todo_id);
+        
+        let task2 = Task::new(
+            "API endpoints".to_string(),
+            "Implement REST API for auth operations".to_string()
+        );
+        board.add_task(task2, &auth_story_id, &todo_id);
+        
+        let task3 = Task::new(
+            "JWT implementation".to_string(),
+            "Add JWT token generation and validation".to_string()
+        );
+        board.add_task(task3, &auth_story_id, &inprogress_id);
+        
+        // Dashboard tasks
+        let task4 = Task::new(
+            "Chart components".to_string(),
+            "Create reusable chart components".to_string()
+        );
+        board.add_task(task4, &dashboard_story_id, &todo_id);
+        
+        let task5 = Task::new(
+            "Layout design".to_string(),
+            "Design responsive dashboard layout".to_string()
+        );
+        board.add_task(task5, &dashboard_story_id, &done_id);
+        
+        board
+    }
 }
