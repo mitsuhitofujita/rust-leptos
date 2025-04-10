@@ -1,11 +1,21 @@
 use leptos::prelude::*;
 mod models;
 use models::*;
+use leptos::web_sys::DragEvent;
+
 
 #[component]
 fn App() -> impl IntoView {
-    let (kanban, _) = create_signal(KanbanBoard::with_demo_data());
-
+    // 初期データを持つカンバンボードを作成
+    let (kanban, set_kanban) = signal(KanbanBoard::with_demo_data());
+    
+    // タスクを移動するコールバック関数
+    let move_task = move |task_id: String, state_id: String| {
+        set_kanban.update(|board| {
+            board.move_task(&task_id, &state_id);
+        });
+    };
+    
     view! {
         <div class="kanban-board">
             <h1>"Kanban Board"</h1>
@@ -49,12 +59,44 @@ fn App() -> impl IntoView {
                                     // このストーリーとステートに対応するタスクを取得
                                     let tasks = board.get_tasks_by_position(&story_id, &state_id);
                                     
+                                    // ドロップイベントのためのステートIDをクローン
+                                    let drop_state_id = state_id.clone();
+                                    let move_task_callback = move_task;
+                                    
                                     view! {
-                                        <div class={class}>
+                                        <div 
+                                            class={class}
+                                            // ドラッグオーバー時のイベント
+                                            on:dragover=move |ev: DragEvent| {
+                                                ev.prevent_default();
+                                            }
+                                            // ドロップ時のイベント
+                                            on:drop=move |ev: DragEvent| {
+                                                ev.prevent_default();
+                                                // データ転送オブジェクトからタスクIDを取得
+                                                if let Some(data_transfer) = ev.data_transfer() {
+                                                    if let Ok(task_id) = data_transfer.get_data("text/plain") {
+                                                        move_task_callback(task_id, drop_state_id.clone());
+                                                    }
+                                                }
+                                            }
+                                        >
                                             // タスクカード
                                             {tasks.iter().map(|task| {
+                                                let task_id = task.id.clone();
+                                                
                                                 view! {
-                                                    <div class="task-card">
+                                                    <div 
+                                                        class="task-card"
+                                                        draggable="true"
+                                                        // ドラッグ開始時のイベント
+                                                        on:dragstart=move |ev: DragEvent| {
+                                                            if let Some(data_transfer) = ev.data_transfer() {
+                                                                // タスクIDをデータとして設定
+                                                                let _ = data_transfer.set_data("text/plain", &task_id);
+                                                            }
+                                                        }
+                                                    >
                                                         <div class="task-title">{task.title.clone()}</div>
                                                         <div class="task-description">{task.description.clone()}</div>
                                                     </div>

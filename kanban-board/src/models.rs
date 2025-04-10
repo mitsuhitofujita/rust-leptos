@@ -120,7 +120,7 @@ impl KanbanBoard {
         
         // Story 3: Settings Page
         let settings_story = Story::new("Settings Page".to_string());
-        let settings_story_id = settings_story.id.clone();
+        let _settings_story_id = settings_story.id.clone();
         board.add_story(settings_story);
         
         // User Authentication tasks
